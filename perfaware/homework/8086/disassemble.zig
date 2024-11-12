@@ -3,6 +3,18 @@
 
 const std = @import("std");
 
+const Operation = enum(u6) { mov = 0b100010 };
+const Mode = enum(u2) { register = 0b11 };
+
+const Instruction = packed struct(u16) {
+    w: bool,
+    d: bool,
+    operation: Operation,
+    operand: u3,
+    register: u3,
+    mode: Mode,
+};
+
 pub fn main() !void {
   // create general purpose allocator
   var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -27,12 +39,17 @@ pub fn main() !void {
   // get file size
   const file_size = (try file.stat()).size;
 
-  std.debug.print("{d}\n", .{file_size});
+  std.debug.print("{d} bytes\n", .{file_size});
+
   // Read entire file, use file size to determent max buffer size
   const file_content = try file.readToEndAlloc(allocator, file_size);
   defer allocator.free(file_content);
 
   std.debug.print("{b}\n", .{file_content});
+
+  for (file_content) |entry| {
+    std.debug.print("{d}\n", .{entry});
+  }
   // const allocator = std.heap.page_allocator;
 
   // const file_path = "listing_0037_single_register_mov";
